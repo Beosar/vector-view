@@ -4,8 +4,18 @@ template<typename T, typename Alloc = std::allocator<T>>
 class vector_view {
 
 public:
-	using iterator = std::vector<T, Alloc>::iterator;
-	using const_iterator = std::vector<T, Alloc>::const_iterator;
+	using iterator = typename std::vector<T, Alloc>::iterator;
+	using const_iterator = typename std::vector<T, Alloc>::const_iterator;
+	using value_type = T;
+	using allocator_type = Alloc;
+	using size_type = typename std::vector<T, Alloc>::size_type;
+	using difference_type = typename  std::vector<T, Alloc>::difference_type;
+	using reference = value_type&;
+	using const_reference = const value_type&;
+	using pointer = std::vector<T, Alloc>::pointer;
+	using const_pointer = typename std::vector<T, Alloc>::const_pointer;
+	using reverse_iterator = std::reverse_iterator<iterator>;
+	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	vector_view(std::vector<T, Alloc>& rVector) :Vector(rVector), itBegin(rVector.begin()), itEnd(rVector.end()) {}
 	vector_view(std::vector<T, Alloc>& rVector, const iterator& itBegin, const iterator& itEnd) :Vector(rVector), itBegin(itBegin), itEnd(itEnd) {}
@@ -38,42 +48,70 @@ public:
 		}
 	}
 
-	size_t size() const {
+	size_t size() const noexcept {
 		return itEnd - itBegin;
 	}
-	size_t empty() const {
+	bool empty() const noexcept {
 		return size() == 0;
 	}
 
-	T& operator[](size_t Index) {
+	T& operator[](size_t Index) noexcept {
 		
 		return *(itBegin + Index);
 	}
 
-	const T& operator[](size_t Index) const {
+	const T& operator[](size_t Index) const noexcept {
 		return *(itBegin + Index);
 	}
 
-	T& back() {
+	T& back() noexcept {
 		return operator[](size() - 1);
 	}
 
-	const T& back() const {
+	const T& back() const noexcept {
 		return operator[](size() - 1);
 	}
 
 	
-	iterator begin() {
+	iterator begin() noexcept {
 		return itBegin;
 	}
-	iterator end() {
+	iterator end() noexcept {
 		return itEnd;
 	}
 
-	const_iterator begin() const {
+	const_iterator begin() const noexcept {
 		return itBegin;
 	}
-	const_iterator end() const {
+	const_iterator end() const noexcept {
+		return itEnd;
+	}
+
+	const_iterator cbegin() const noexcept {
+		return itBegin;
+	}
+	const_iterator cend() const noexcept {
+		return itEnd;
+	}
+
+	reverse_iterator rbegin() noexcept {
+		return itBegin;
+	}
+	reverse_iterator rend() noexcept {
+		return itEnd;
+	}
+
+	const_reverse_iterator rbegin() const noexcept {
+		return itBegin;
+	}
+	const_reverse_iterator rend() const noexcept {
+		return itEnd;
+	}
+
+	const_reverse_iterator crbegin() const noexcept {
+		return itBegin;
+	}
+	const_reverse_iterator crend() const noexcept {
 		return itEnd;
 	}
 
@@ -87,7 +125,7 @@ public:
 		return it;
 	}
 
-	auto erase(iterator it) {
+	auto erase(iterator it) noexcept {
 		const auto Size = size();
 		const auto Offset = it - itBegin;
 		it = Vector.erase(it);
@@ -97,7 +135,7 @@ public:
 	}
 
 	
-	auto erase(iterator itFirst, const iterator& itLast) {
+	auto erase(iterator itFirst, const iterator& itLast) noexcept {
 		const auto Size = size();
 		const auto Offset = itFirst - itBegin;
 		const size_t NumErased = std::distance(itFirst, itLast);
@@ -107,7 +145,7 @@ public:
 		return itFirst;
 	}
 
-	void pop_back() {
+	void pop_back() noexcept {
 		erase(itEnd);
 	}
 	
@@ -121,39 +159,65 @@ private:
 
 template<typename T, typename Alloc = std::allocator<T>>
 class const_vector_view {
-
 public:
-	using const_iterator = std::vector<T, Alloc>::const_iterator;
+	using const_iterator = typename std::vector<T, Alloc>::const_iterator;
+	using value_type = T;
+	using allocator_type = Alloc;
+	using size_type = typename std::vector<T, Alloc>::size_type;
+	using difference_type = typename std::vector<T, Alloc>::difference_type;
+	using const_reference = const value_type&;
+	using const_pointer = typename std::vector<T, Alloc>::const_pointer;
+	using const_reverse_iterator = typename std::reverse_iterator<const_iterator>;
 
 	const_vector_view(const const_iterator& itBegin, const const_iterator& itEnd) : itBegin(itBegin), itEnd(itEnd) {}
 	const_vector_view(const std::vector<T, Alloc>& rVector) : itBegin(rVector.begin()), itEnd(rVector.end()) {}
+	const_vector_view(const vector_view<T, Alloc>& rVectorView) : itBegin(rVectorView.begin()), itEnd(rVectorView.end()) {}
 
 	
-	size_t size() const {
+	size_t size() const noexcept {
 		return itEnd - itBegin;
 	}
-	size_t empty() const {
+	bool empty() const noexcept {
 		return size() == 0;
 	}
 
 	
-	const T& operator[](size_t Index) const {
+	const T& operator[](size_t Index) const noexcept {
 		return *(itBegin + Index);
 	}
 
-	const T& back() const {
+	const T& back() const noexcept {
 		return operator[](size() - 1);
 	}
 
 
-	const_iterator begin() const {
+	const_iterator begin() const noexcept {
 		return itBegin;
 	}
-	const_iterator end() const {
+	const_iterator end() const noexcept {
 		return itEnd;
 	}
 
+	const_iterator cbegin() const noexcept {
+		return itBegin;
+	}
+	const_iterator cend() const noexcept {
+		return itEnd;
+	}
 
+	const_reverse_iterator rbegin() const noexcept {
+		return itBegin;
+	}
+	const_reverse_iterator rend() const noexcept {
+		return itEnd;
+	}
+
+	const_reverse_iterator crbegin() const noexcept {
+		return itBegin;
+	}
+	const_reverse_iterator crend() const noexcept {
+		return itEnd;
+	}
 
 
 
